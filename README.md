@@ -150,7 +150,7 @@ $$
 where the variance parameter of the distribution quantifies the aleotric and epistemic uncertainties in the predicted travel times.
 
 \subsection{Ensemble Prediction}
-The CAVI optimization algorithm becomes expensive for large data sets in the variational relevance vector machine. The computation scale of the VRVM algorithm is $\mathcal{O}(N^3)$, and this is due to the existence of the covariance matrix inverse operation in computing weights posterior distributions. Hence, this method is not scalable for larger data sets unless an appropriate training process is adopted. One way to make use of this approach for large data sets is to take advantage of the ARD property of the method, such that iteratively adding new basis functions and pruning non-relevance ones. To prune insignificant basis functions, either a weight threshold or a threshold for hyperparameter of $\alpha$ can be used. Another way to make this approach practical is to train different ensembles of the VRVM model in parallel with different samples of data and then average predictions. To do so, the ensemble prediction can be treated as uniformly weighted mixture model of the predictive distributions defined as \eqref{ensemble1} and \eqref{ensemble2} \cite{lakshminarayanan2016simple},
+The CAVI optimization algorithm becomes expensive for large data sets in the variational relevance vector machine. The computation scale of the VRVM algorithm is $\mathcal{O}(N^3)$, and this is due to the existence of the covariance matrix inverse operation in computing weights posterior distributions. Hence, this method is not scalable for larger data sets unless an appropriate training process is adopted. One way to make use of this approach for large data sets is to take advantage of the ARD property of the method, such that iteratively adding new basis functions and pruning non-relevance ones. To prune insignificant basis functions, either a weight threshold or a threshold for hyperparameter of $\alpha$ can be used. Another way to make this approach practical is to train different ensembles of the VRVM model in parallel with different samples of data and then average predictions. To do so, the ensemble prediction can be treated as uniformly weighted mixture model of the predictive distributions defined as \cite{lakshminarayanan2016simple},
 
 $$
 p(\hat{y}|\hat{x}, \mathcal{D})  \propto \frac{1}{\mathcal{M}} \sum_{\mathfrak{m}=1}^\mathcal{M} p_{\mu_\mathfrak{m},\sigma^2_\mathfrak{m}}(\hat{y}|\hat{x}, \mathcal{D}_\mathfrak{m})
@@ -163,7 +163,7 @@ $$
 where $\mathcal{M}$ is the number of ensembles.
 
 
-Hence mixture model above can be approximated with Gaussian distribution with mean and variance shown expressed as \eqref{ensemblef1} and \eqref{ensemblef2},
+Hence mixture model above can be approximated with Gaussian distribution with mean and variance shown expressed as,
 
 $$
 p(\hat{y}|\hat{x}, \mathcal{D})  \propto\mathcal{N}(\hat{\mu}, \hat{\sigma}^2),
@@ -177,4 +177,44 @@ $$
 \hat{\sigma}^2= \frac{1}{\mathcal{M}}\sum_{\mathfrak{m}=1}^\mathcal{M}(\hat{\sigma}^2_\mathfrak{m}+\hat{\mu}^2_\mathfrak{m})-\hat{\mu}^2
 $$
 
-
+header-includes:
+  - \usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\begin{algorithm}[]
+\caption{VRVM with Ensemble Predictive Distribution.}\label{alg:alg1}
+\begin{algorithmic}
+\STATE 
+\STATE {\textsc{INPUT}} 
+\STATE \hspace{0.5cm} $q(w) := \mathcal{N}(\mu',\Sigma')$
+\STATE \hspace{0.5cm} $q(\alpha_k) := \text{Gamma}(a'_k,b'_k), k\in{1,...m}$
+\STATE \hspace{0.5cm} $q(\lambda) := \text{Gamma}(e',f')$
+\STATE {\textsc{OUTPUT}} 
+\STATE \hspace{0.5cm}$a', b', \mu', \Sigma', e', f', \text{ELBO}$
+\STATE
+\STATE \hspace{0cm}{\textsc{TRAINING}}
+\STATE \hspace{0cm}$ \textbf{For } \mathcal{D}_\mathfrak{m}, \mathfrak{m}\in 1,\dots,\mathcal{M}\textbf{ do} $
+\STATE \hspace{0.5cm}$ \textbf{Initialize } a'_k, b'_k, \mu', \Sigma', e', f' $
+\STATE \hspace{0.5cm} {\textbf{while}} $\textit{ELBO is not converged}$ {\textbf{do:}}
+\STATE \hspace{1cm} {\textsc{Update}} $q(\alpha_k)$ {\textsc{by setting }}
+\STATE \hspace{1.5cm} $a'_k = a_0 + 1/2$
+\STATE \hspace{1.5cm} $b'_k = 0.5\frac{e'}{f'}\mathbb{E}[w_k^2]+ b_0$
+\STATE \hspace{1cm} {\textsc{Update}} $q(\lambda)$ {\textsc{by setting }}
+\STATE \hspace{1.5cm} $e' = e_0 + 0.5d+ 0.5N$
+\STATE \hspace{1.5cm} $f' = 0.5\sum_{i=1}^{N}\mu'(y_i-\phi(x_i)^Tw)^2 + f_0 + 0.5\mu'^TM_{\alpha}\mu'$
+\STATE \hspace{1cm} {\textsc{Update}} $q(w)$ {\textsc{by setting }}
+\STATE \hspace{1.5cm} $\Sigma' = \frac{f'}{e'}(M_{\alpha} + \Sigma_{i=1}^{N}\phi(x_i)\phi(x_i)^T)^{-1}$
+\STATE \hspace{1.5cm} $\mu' = \Sigma' \frac{e'}{f'}\sum_{i=1}^{N}y_i\phi(x_i))$
+\STATE \hspace{1cm} {\textsc{Evaluate}} $\textit{ELBO}$ 
+\STATE
+\STATE \hspace{0.5cm}{\textsc{PREDICTION}}
+\STATE \hspace{0.5cm} {\textsc{Evaluate Posterior Distribution}}
+\STATE \hspace{1cm} $p(\hat{y}|y,\mathcal{D}_\mathfrak{m})  \propto \mathcal{N}(\hat{\mu}_\mathfrak{m},\hat{\sigma}^2_\mathfrak{m})$
+\STATE \hspace{1cm} $\hat{\mu}_\mathfrak{m} = \mu'^T\phi(\hat{x}_i)$
+\STATE \hspace{1cm} $\hat{\sigma}^2_\mathfrak{m} = \frac{f'}{e'}+\phi(\hat{x}_i)^T\Sigma'\phi(\hat{x}_i )$
+\STATE
+\STATE {\textsc{ENSEMBLE PREDICTION}}
+\STATE \hspace{0.5cm} $p(\hat{y}|\hat{x}, \mathcal{D}) \propto \mathcal{N}(\hat{\mu},\hat{\sigma}^2)$
+\STATE \hspace{0.5cm} $\hat{\mu} = \frac{1}{\mathcal{M}}\sum_{\mathfrak{m}=1}^\mathcal{M}\hat{\mu}_\mathfrak{m}$
+\STATE \hspace{0.5cm} $\hat{\sigma}^2= \frac{1}{\mathcal{M}}\sum_{\mathfrak{m}=1}^\mathcal{M}(\hat{\sigma}^2_\mathfrak{m}+\hat{\mu}^2_\mathfrak{m})-\hat{\mu}^2$
+\end{algorithmic}
+\label{alg1}
+\end{algorithm}
