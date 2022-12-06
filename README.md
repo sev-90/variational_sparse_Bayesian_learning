@@ -8,9 +8,4 @@ The variational relevance vector machine is a kernel-based probabilistic machine
 
 ## Model specification
 Suppose our data is $\mathcal{D} = \{(\textbf{x}_i, y_i) | i=1,\dots, n\}$ where $\textbf{x}_i \in \mathbb{R}^d$ is the input feature vector, and $y_i \in \mathbb{R}$ is the target scalar. From historical data, our goal is to learn a model that given input vector $x_i$ outputs the value of the target variable $y_i$. In our travel time modeling context, using ambulance historical trip data, we train a probabilistic model that predicts the route travel time given origin-destination coordinations and the trip's start time. The probabilistic framework enables us to model the uncertainties in the ambulance travel times predictions by estimating both aleatoric and epistemic uncertainties that are attributed, to name a few, to the inherent stochasticity of the phenomenon, lack of enough knowledge, and imperfection model structure assumption. Based on the standard probabilistic formulation, the target value can be calculated by a function $f$ parametrized by $w$ as equation \eqref{model} 
-%
-\begin{equation}
-\label{model}
-y_i = f(x_i;w) + \epsilon_i,
-\end{equation}
-%
+<math> y_i = f(x_i;w) + \epsilon_i </math>
