@@ -101,11 +101,15 @@ where the distributions parameters are described in \eqref{parameters}:
 
 $$
 e' = e_0 + 0.5m+ 0.5N,\\
+$$
+$$
 f' = 0.5\sum_{i=1}^{N}\mu'(y_i-\phi(x_i)^Tw)^2 + f_0 + 0.5\mu'^TM_{\alpha}\mu',\\
 M_{\alpha}=\text{diag}(\frac{a'_1}{b'_1},\dots,\frac{a'_k}{b'_k}),\\
 \Sigma' = \frac{f'}{e'}(M_{\alpha} + \Sigma_{i=1}^{N}\phi(x_i)\phi(x_i)^T)^{-1},\\
 \mu' = \Sigma' \frac{e'}{f'}\sum_{i=1}^{N}y_i\phi(x_i)),\\
 a'_k = a_0 + 1/2,\\
 b'_k = 0.5\frac{e'}{f'}\mathbb{E}[w_k^2]+ b_0,\\
+$$
+$$
 \mathbb{E}_{q(w)}[w_k^2] = {\mu'_k}^2 + \Sigma'_{kk}.
 $$
