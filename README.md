@@ -177,4 +177,8 @@ $$
 \hat{\sigma}^2= \frac{1}{\mathcal{M}}\sum_{\mathfrak{m}=1}^\mathcal{M}(\hat{\sigma}^2_\mathfrak{m}+\hat{\mu}^2_\mathfrak{m})-\hat{\mu}^2
 $$
 
-![plot](./figures/psudocode.png #center)
+<center>
+
+![plot](./figures/psudocode.png)
+
+</center>
