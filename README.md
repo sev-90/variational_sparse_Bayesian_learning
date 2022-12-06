@@ -177,10 +177,8 @@ $$
 \hat{\sigma}^2= \frac{1}{\mathcal{M}}\sum_{\mathfrak{m}=1}^\mathcal{M}(\hat{\sigma}^2_\mathfrak{m}+\hat{\mu}^2_\mathfrak{m})-\hat{\mu}^2
 $$
 
----
-header-includes:
-  - \usepackage[ruled,vlined,linesnumbered]{algorithm2e}
----
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+
 \begin{algorithm}[]
 \caption{VRVM with Ensemble Predictive Distribution.}\label{alg:alg1}
 \begin{algorithmic}
