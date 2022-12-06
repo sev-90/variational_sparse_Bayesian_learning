@@ -33,45 +33,35 @@ $$
 We define $\sigma^2_w = (\lambda\Lambda)^{-1}$ where $\Lambda=\text{diag}(\alpha_1,...,\alpha_m)$. It implies that the parameter $w_i$ depends on $\alpha_i$ which corresponds to inverse of variance of $w_i$ \cite{ueda2002bayesian}.
 In fully Bayesian paradigm, following the hierarchical prior setting, the variational RVM method considers hyperpriors over hyperparameters. To benefit from analytical propertries of the Gaussian distributions' conjugate priors, we pose a Gamma prior distribution over inverse noise variance, $\lambda$, as $p(\lambda)=\text{Gamma}(e_0,f_0)$ and a Gamma hyperprior distribution over $\alpha_k,k \in [1,\dots,m]$ as $p(\alpha_k)=\text{Gamma}(a_0,b_0)$. Initially, we set small values for $a_0$, $b_0$, $e_0$, and $f_0$ to have non-informative priors. This method called ``Automatic Relevance Determination (ARD)"  that automatically selects the relevant parameters $w_i$ based on the variance of the parameter $\sigma^2_{w_i}$ \cite{bishop2013variational}.
 
-\subsection{Predictive Distribution}
-Bayesian learning aims at estimating the predictive posterior distribution of the future observation $y'$ for corresponding new input vector $x'$ given all previously observed data $(y,X)$ and the same modeling assumptions. The posterior predictive distribution is the marginalization of the likelihood over the posterior distributions of the model parameters, shown by \eqref{pred}.
-%
-\begin{equation}
-\label{pred}
-\begin{aligned}
+## Predictive Distribution
+Bayesian learning aims at estimating the predictive posterior distribution of the future observation $y'$ for corresponding new input vector $x'$ given all previously observed data $(y,X)$ and the same modeling assumptions. The posterior predictive distribution is the marginalization of the likelihood over the posterior distributions of the model parameters, shown by
+
+$$
 p(y'|x';y,X) = \int{p(y'|x',w,\lambda)p(w|y,X,\lambda)p(\lambda|y,X)}dwd\lambda
-\end{aligned}
-\end{equation}
-%
-If we show the model parameters with $\theta=\{\lambda, w\}$, using the Bayes rule, the model posteriors $p(\theta|y)$, can be calculated as \eqref{bayesRule}
-%
-\begin{equation}
-\begin{aligned}
+$$
+
+If we show the model parameters with $\theta=\{\lambda, w\}$, using the Bayes rule, the model posteriors $p(\theta|y)$, can be calculated as
+
+$$
 p(\theta|y) = \frac{p(y|\theta)p(\theta)}{p(y)}\\
 p(y) = \int{p(y|\theta)p(\theta)d\theta}
-\end{aligned}
-\label{bayesRule}
-\end{equation}
-%
-With our model specification, calculating the marginal probability of observed data, a.k.a evidence (the integral in the denominator), is intractable. Variational inference (VI) techniques can be adopted to approximate the inference in such a case. Basically, the VI technique finds the optimum member from the apriori specified family for posteriors,$\mathcal{Q}$, by minimizing the distance of the approximated distribution from the exact posterior distributions, \ref{VIopt}. 
-%
-\begin{equation}
-\begin{aligned}
+$$
+
+With our model specification, calculating the marginal probability of observed data, a.k.a evidence (the integral in the denominator), is intractable. Variational inference (VI) techniques can be adopted to approximate the inference in such a case. Basically, the VI technique finds the optimum member from the apriori specified family for posteriors,$\mathcal{Q}$, by minimizing the distance of the approximated distribution from the exact posterior distributions
+
+$$
 p(\theta|y) = q(\theta)\\
 q^*(\theta) = \underset{q(\theta)\in \mathcal{Q}}{\argmin} \text{ KL}q(\theta) || p(\theta|y)
-\end{aligned}
-\label{VIopt}
-\end{equation}
-%
-The distance between approximated and exact posteriors of parameters is quantified using Kullback-Leibler (KL) divergence measure defined by \ref{KL}.
-\begin{equation}
-\begin{aligned}
+$$
+
+The distance between approximated and exact posteriors of parameters is quantified using Kullback-Leibler (KL) divergence measure defined by
+
+$$
 \text{ KL}q(\theta) || p(\theta|y) = \mathbb{E}[\ln q(\theta)] - \mathbb{E}[\ln p(\theta,y)] + \ln p(y)
-\end{aligned}
-\label{KL}
-\end{equation}
+$$ 
+
 The following section shows how to solve this optimization objective function.
-\subsection{Variational Inference}
+## Variational Inference
 It is not easy in many complex statistical models with a Bayesian setting, or sometimes it is impossible to derive an exact analytical expression for the inference. Monte Carlo sampling techniques are the alternatives for estimating distributions for such intractable analytical solutions. While in such models with many parameters or in a large data set, using Monte Carlo sampling techniques are computationally expensive. Variational inference is another alternative that poses an assumption on the family of posteriors and then uses optimization to find the optimal member of the family. Therefore, variation inference gives exact closed-form expression for the approximated inference. Even though VI is often faster when dealing with large data sets or complex models, in contrast to the sampling techniques that are often unbiased and produced samples from the target distribution, it is not guaranteed that the target posterior distribution is in the same family as assumed posterior family $\mathcal{Q}$.
 \subsubsection{Variational Inference Objective Function}
 In equation \ref{KL}, the KL divergence calculation requires the calculation of evidence part $p(y)$, which is hard to obtain in our case. In such cases, instead of minimizing the whole equation, the optimization objective can be held by maximizing the negative of the two first terms, also called evidence lower bound (ELBO). Thereby, maximizing ELBO equivalently minimizes the KL divergence measure (for more detail, see \cite{blei2017variational}).
