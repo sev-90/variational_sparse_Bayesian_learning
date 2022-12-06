@@ -20,7 +20,7 @@ $$
 Here, we use Gaussian kernel to calculate multi-kernel functions since it is proven that Gaussian kernels yield higher prediction accuracy in machine learning application\cite{smola2004tutorial}. Kernel functions enable us to capture the non-linearity in the raw representation of the input space by mapping the input space onto the higher dimensional feature space that also gives rise to the higher computational power\cite{muller2001introduction}. Simply put, with kernel functions evaluated at each data point, we establish a linear relationship between the implicit feature space and the target values where the implicit higher dimensional feature space contains the quantified similarities between pairs of raw input features via Gaussian kernel function. The Gaussian multi-kernel function between two vectors $x_1$ and $x_2$ is expressed by
 
 $$
-k(x_1,x_2)=\sum_{l\in L}\exp(-\frac{||x_1-x_2||^2}{\l^2}),
+k(x_1,x_2)=\sum_{l\in L}\exp(-\frac{||x_1-x_2||^2}{l^2}),
 $$
 
 where $L$ contains the width parameters that need to be specified a priori. The predictive accuracy of the Kernel-based models is highly influenced by the choice of width parameter, while finding its optimum value is a challenge. To identify the optimum width parameter, a general approach is to utilize the cross-validation technique. Besides, adopting the combination of multiple kernels with different width parameters instead of using one single kernel function can also increase the generalization of the kernel-based models. In our modeling setting, we adopt the combination of the multiple kernels, each constructed by a different width parameter. We find the optimum values for the width parameters using cross-validation.
@@ -32,3 +32,91 @@ $$
 
 We define $\sigma^2_w = (\lambda\Lambda)^{-1}$ where $\Lambda=\text{diag}(\alpha_1,...,\alpha_m)$. It implies that the parameter $w_i$ depends on $\alpha_i$ which corresponds to inverse of variance of $w_i$ \cite{ueda2002bayesian}.
 In fully Bayesian paradigm, following the hierarchical prior setting, the variational RVM method considers hyperpriors over hyperparameters. To benefit from analytical propertries of the Gaussian distributions' conjugate priors, we pose a Gamma prior distribution over inverse noise variance, $\lambda$, as $p(\lambda)=\text{Gamma}(e_0,f_0)$ and a Gamma hyperprior distribution over $\alpha_k,k \in [1,\dots,m]$ as $p(\alpha_k)=\text{Gamma}(a_0,b_0)$. Initially, we set small values for $a_0$, $b_0$, $e_0$, and $f_0$ to have non-informative priors. This method called ``Automatic Relevance Determination (ARD)"  that automatically selects the relevant parameters $w_i$ based on the variance of the parameter $\sigma^2_{w_i}$ \cite{bishop2013variational}.
+
+\subsection{Predictive Distribution}
+Bayesian learning aims at estimating the predictive posterior distribution of the future observation $y'$ for corresponding new input vector $x'$ given all previously observed data $(y,X)$ and the same modeling assumptions. The posterior predictive distribution is the marginalization of the likelihood over the posterior distributions of the model parameters, shown by \eqref{pred}.
+%
+\begin{equation}
+\label{pred}
+\begin{aligned}
+p(y'|x';y,X) = \int{p(y'|x',w,\lambda)p(w|y,X,\lambda)p(\lambda|y,X)}dwd\lambda
+\end{aligned}
+\end{equation}
+%
+If we show the model parameters with $\theta=\{\lambda, w\}$, using the Bayes rule, the model posteriors $p(\theta|y)$, can be calculated as \eqref{bayesRule}
+%
+\begin{equation}
+\begin{aligned}
+p(\theta|y) = \frac{p(y|\theta)p(\theta)}{p(y)}\\
+p(y) = \int{p(y|\theta)p(\theta)d\theta}
+\end{aligned}
+\label{bayesRule}
+\end{equation}
+%
+With our model specification, calculating the marginal probability of observed data, a.k.a evidence (the integral in the denominator), is intractable. Variational inference (VI) techniques can be adopted to approximate the inference in such a case. Basically, the VI technique finds the optimum member from the apriori specified family for posteriors,$\mathcal{Q}$, by minimizing the distance of the approximated distribution from the exact posterior distributions, \ref{VIopt}. 
+%
+\begin{equation}
+\begin{aligned}
+p(\theta|y) = q(\theta)\\
+q^*(\theta) = \underset{q(\theta)\in \mathcal{Q}}{\argmin} \text{ KL}q(\theta) || p(\theta|y)
+\end{aligned}
+\label{VIopt}
+\end{equation}
+%
+The distance between approximated and exact posteriors of parameters is quantified using Kullback-Leibler (KL) divergence measure defined by \ref{KL}.
+\begin{equation}
+\begin{aligned}
+\text{ KL}q(\theta) || p(\theta|y) = \mathbb{E}[\ln q(\theta)] - \mathbb{E}[\ln p(\theta,y)] + \ln p(y)
+\end{aligned}
+\label{KL}
+\end{equation}
+The following section shows how to solve this optimization objective function.
+\subsection{Variational Inference}
+It is not easy in many complex statistical models with a Bayesian setting, or sometimes it is impossible to derive an exact analytical expression for the inference. Monte Carlo sampling techniques are the alternatives for estimating distributions for such intractable analytical solutions. While in such models with many parameters or in a large data set, using Monte Carlo sampling techniques are computationally expensive. Variational inference is another alternative that poses an assumption on the family of posteriors and then uses optimization to find the optimal member of the family. Therefore, variation inference gives exact closed-form expression for the approximated inference. Even though VI is often faster when dealing with large data sets or complex models, in contrast to the sampling techniques that are often unbiased and produced samples from the target distribution, it is not guaranteed that the target posterior distribution is in the same family as assumed posterior family $\mathcal{Q}$.
+\subsubsection{Variational Inference Objective Function}
+In equation \ref{KL}, the KL divergence calculation requires the calculation of evidence part $p(y)$, which is hard to obtain in our case. In such cases, instead of minimizing the whole equation, the optimization objective can be held by maximizing the negative of the two first terms, also called evidence lower bound (ELBO). Thereby, maximizing ELBO equivalently minimizes the KL divergence measure (for more detail, see \cite{blei2017variational}).
+
+In our modeling context, approximating the joint posteriorof parameters as $p(w,\lambda, \alpha_1,...,\alpha_m|y,X)$ with $q(w,\lambda, \alpha_1,\dots,\alpha_m)$, the ELBO objective function which we represent by $\mathcal{L}$  can be presented by 
+
+$$
+\mathcal{L} = \mathbb{E}_q[\ln p(y,w,\lambda, \alpha_1,...,\alpha_m|X)] -\mathbb{E}_q[\ln q(w,\lambda, \alpha_1,...,\alpha_m)]
+$$
+
+With mean-field property that assumes all parameters are independent, approximate joint posterior can be factorized as
+
+$$
+\begin{aligned}
+q(w,\lambda, \alpha_1,...,\alpha_m) = q(w)q(\lambda)q(\alpha_1)...q(\alpha_m)
+$$
+
+Next, we utilize the variational inference technique to derive a closed-form expression for each approximate posterior of model parameters.
+
+## Approximate Inferences
+To find the optimal approximate posterior distribution say $q^*(\theta_j)$, the procedure is the exponentiation of the expected log of the joint probability of observed data and parameters taken over all parameters except the parameter $j$, i.e., $q(\theta_{-j})$ as shown in \eqref{var_infer} (the details of derivation can be found in \cite{bishop2013variational}:
+
+$$
+q^*(\theta_j) \propto \exp\{\mathbb{E}_{-j}[\ln p(y, w, \lambda, \alpha_1,...,\alpha_m|x)]\} 
+$$
+
+Following the rule presented at \eqref{var_infer}, the optimal variational posterior of model parameters are derived analytically since the conjugate priors (Gamma distributions) to the Gaussian model are adopted. The approximated inferences are presented in \eqref{posteriors}.
+ 
+$$
+q(\lambda) \propto \text{Gamma}(e',f'),\\
+q(w) \propto \mathcal{N}(\mu',\Sigma'),\\
+q(\alpha_k) \propto \text{Gamma}(a'_k,b'_k), k\in{1,...m}\\
+$$
+
+
+where the distributions parameters are described in \eqref{parameters}:
+
+
+$$
+e' = e_0 + 0.5m+ 0.5N,\\
+f' = 0.5\sum_{i=1}^{N}\mu'(y_i-\phi(x_i)^Tw)^2 + f_0 + 0.5\mu'^TM_{\alpha}\mu',\\
+M_{\alpha}=\text{diag}(\frac{a'_1}{b'_1},\dots,\frac{a'_k}{b'_k}),\\
+\Sigma' = \frac{f'}{e'}(M_{\alpha} + \Sigma_{i=1}^{N}\phi(x_i)\phi(x_i)^T)^{-1},\\
+\mu' = \Sigma' \frac{e'}{f'}\sum_{i=1}^{N}y_i\phi(x_i)),\\
+a'_k = a_0 + 1/2,\\
+b'_k = 0.5\frac{e'}{f'}\mathbb{E}[w_k^2]+ b_0,\\
+\mathbb{E}_{q(w)}[w_k^2] = {\mu'_k}^2 + \Sigma'_{kk}.
+$$
