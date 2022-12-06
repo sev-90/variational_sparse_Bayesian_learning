@@ -75,7 +75,6 @@ $$
 With mean-field property that assumes all parameters are independent, approximate joint posterior can be factorized as
 
 $$
-\begin{aligned}
 q(w,\lambda, \alpha_1,...,\alpha_m) = q(w)q(\lambda)q(\alpha_1)...q(\alpha_m)
 $$
 
