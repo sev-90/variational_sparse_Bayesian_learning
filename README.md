@@ -179,6 +179,6 @@ $$
 
 <center>
 
-![plot](./figures/psudocode.png)
+![Algorithm](./figures/psudocode.png)
 
 </center>
