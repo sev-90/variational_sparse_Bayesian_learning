@@ -7,7 +7,7 @@ Accurate predictions of the route travel times and quantifying the reliability o
 The variational relevance vector machine is a kernel-based probabilistic machine learning algorithm that is formulated based on the sparse Bayesian learning \cite{bishop2013variational, tipping2001sparse}. This algorithm has a functional form equivalent to the support vector machine while using a sparse set of basis functions gives higher generalization performance. In sparse Bayesian learning, most parameters are automatically estimated as zero, and only a few ``relevance'' parameters are non-zero. Therefore, this approach finds a set of relevant basis functions that can be used to make efficient predictions. Sparse Bayesian learning poses prior distributions over model parameters and hyperparameters and estimates their posteriors using optimization. While the posterior distributions of most irrelevant parameters become zero, the remaining parameters are relevant parameters for the predictions. In the variational relevance vector machine, variational inference approximates the optimal posterior distributions. The following section will summarize the Bayesian model structure and the variational posteriors.
 
 ## Model specification
-Suppose our data is $\mathcal{D} = \{(\textbf{x}_i, y_i) | i=1,\dots, n\}$ where $\textbf{x}_i \in \mathbb{R}^d$ is the input feature vector, and $y_i \in \mathbb{R}$ is the target scalar. From historical data, our goal is to learn a model that given input vector $x_i$ outputs the value of the target variable $y_i$. In our travel time modeling context, using ambulance historical trip data, we train a probabilistic model that predicts the route travel time given origin-destination coordinations and the trip's start time. The probabilistic framework enables us to model the uncertainties in the ambulance travel times predictions by estimating both aleatoric and epistemic uncertainties that are attributed, to name a few, to the inherent stochasticity of the phenomenon, lack of enough knowledge, and imperfection model structure assumption. Based on the standard probabilistic formulation, the target value can be calculated by a function $f$ parametrized by $w$ as equation:
+Suppose our data is $\mathcal{D} = \{(\textbf{x}_i, y_i) | i=1,\dots, n\}$ where $\textbf{x}_i \in \mathbb{R}^d$ is the input feature vector, and $y_i \in \mathbb{R}$ is the target scalar. From historical data, our goal is to learn a model that given input vector $x_i$ outputs the value of the target variable $y_i$. In our travel time modeling context, using historical trip data, we train a probabilistic model that predicts the route travel time given origin-destination coordinations and the trip's start time. The probabilistic framework enables us to model the uncertainties in the travel times predictions by estimating both aleatoric and epistemic uncertainties that are attributed, to name a few, to the inherent stochasticity of the phenomenon, lack of enough knowledge, and imperfection model structure assumption. Based on the standard probabilistic formulation, the target value can be calculated by a function $f$ parametrized by $w$ as equation:
 
 $$ y_i = f(x_i;w) + \epsilon_i $$
 
@@ -181,12 +181,33 @@ $$
 
 ## Model Verification
 Before training the VRVM model using travel time data sets, the implemented VRVM algorithm is verified with two widely used data sets: 1) $Sinc$ function, and 2) Boston housing data sets and compare the results with repoted results in literature review.
-## $Sinc$ function
+## Sinc function
 Using the suggested synthetic data generation in \cite{tipping2001sparse}, we evaluate the performance of the VRVM model through three different trials. The Gaussian kernel is used for training the VRVM models. For each trial, we generate 100 noisy target values, $y$s, at 100 linearly selected $x$s from $x\in [-10,10]$ using the function $Sinc(x)=sin(x)/x$ with Gaussian additive noise with standard deviations of 0.1, 0.2, and 0.3, respectively. The noise estimate and the root-mean-square (RMS) deviation from the true function evaluated at 1000 linearly spaced test samples in $[-10,10]$ averaged over 100 random instantiations of the noise are presented at table 1. The reported RMS deviation from the true function for Gaussian additive noise 0.1 is 0.038 \cite{bishop2013variational}.
 
-![Algorithm](./figures/table.png)
+![Algorithm](./figures/stats.png)
 
 ## Boston housing data
 The housing data set contains 506 examples for median housing prices with 13 feature variables. We train the VRVM model using Gaussian kernel and based on housing data to predict housing prices. The averaged results for 10 randomly partitioned Boston Housing data into 481 training, and 25 test data sets are presented in table 1. The estimated noise and the mean squared error are 2.42 and 9.84, respectively, whereas the corresponding values reported at \cite{bishop2013variational} are 2.49 and 10.36 (\cite{bishop2013variational} utilized third order polynomial kernel), and the slight difference might be due to random data partition and different kernel type used.
  
- ![Algorithm](./figures/sin.png)
+![Algorithm](./figures/sin.png)
+
+## Travel time predictions and predictive uncertainty
+Then, trained $\mathcal{M}=20$ VRVM models are utilized to construct the predictive ensemble model. The predictive ensemble distribution is the mixture of predictive distributions of the trained models \eqref{ensemble1}. To evalute the performance of the trained models and the final ensemble model, two different metrics are deployed, the root-mean-square error (RMSE) and mean absolute percentage error (MAPE).
+Figure \ref{fig:fig_4}(a) left presents the predictions on unseen test data set (size of ~1.2k) for trip travel times +/- one predicted standard deviation, which represents the epistemic uncertainty automatically predicted in the adopted Bayesian learning framework. Figure \ref{fig:fig_4}(a) right also is the errors histograms where error is defined as $(error = y_{predict}-y_{true})$. To evaluate the overall generalization performance of the model, we tested the trained ensemble model on five different unseen data sets. The average RMSE score was 147.24s with a standard deviation of 10.31s, while the average MAPE score was 0.45 with a standard deviation of 0.016. Overall, the scores imply a satisfactory performance specifically for most trips with medium travel time length.
+In contrast, for very short trips and very long trips, the model's performance degrades. From figure \ref{fig:fig_4}(b), it can be observed that for the relatively short trips, the model overestimates the travel times, and this is perhaps due to averaging effect that arises from utilizing constant width parameter in Gaussian kernel functions. While, for the long trips, the discrepancy might be due to either something unusual along the journey or the lack of enough long trip data.  
+
+### Historical Trip Travel Time Spatial Pattern
+![Algorithm](./figures/travel_time_data_visualization.png)
+
+### Trip Travel Time Predictions vs Ground Truth
+![Algorithm](./figures/rvs.png)
+
+### Trip Travel Time Predictions vs Ground Truth
+![Algorithm](./figures/prediction_vs_gt.png)
+
+### Temporal pattern of predictions
+![Algorithm](./figures/temporal_pattern.png)
+
+
+
+
