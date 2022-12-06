@@ -149,4 +149,32 @@ $$
 
 where the variance parameter of the distribution quantifies the aleotric and epistemic uncertainties in the predicted travel times.
 
+\subsection{Ensemble Prediction}
+The CAVI optimization algorithm becomes expensive for large data sets in the variational relevance vector machine. The computation scale of the VRVM algorithm is $\mathcal{O}(N^3)$, and this is due to the existence of the covariance matrix inverse operation in computing weights posterior distributions. Hence, this method is not scalable for larger data sets unless an appropriate training process is adopted. One way to make use of this approach for large data sets is to take advantage of the ARD property of the method, such that iteratively adding new basis functions and pruning non-relevance ones. To prune insignificant basis functions, either a weight threshold or a threshold for hyperparameter of $\alpha$ can be used. Another way to make this approach practical is to train different ensembles of the VRVM model in parallel with different samples of data and then average predictions. To do so, the ensemble prediction can be treated as uniformly weighted mixture model of the predictive distributions defined as \eqref{ensemble1} and \eqref{ensemble2} \cite{lakshminarayanan2016simple},
+
+$$
+p(\hat{y}|\hat{x}, \mathcal{D})  \propto \frac{1}{\mathcal{M}} \sum_{\mathfrak{m}=1}^\mathcal{M} p_{\mu_\mathfrak{m},\sigma^2_\mathfrak{m}}(\hat{y}|\hat{x}, \mathcal{D}_\mathfrak{m})
+$$
+
+$$
+p(\hat{y}|\hat{x}, \mathcal{D})  \propto \frac{1}{\mathcal{M}} \sum_{\mathfrak{m}=1}^\mathcal{M} \mathcal{N}(\hat{\mu}_\mathfrak{m}, \hat{\sigma}^2_\mathfrak{m}),
+$$
+
+where $\mathcal{M}$ is the number of ensembles.
+
+
+Hence mixture model above can be approximated with Gaussian distribution with mean and variance shown expressed as \eqref{ensemblef1} and \eqref{ensemblef2},
+
+$$
+p(\hat{y}|\hat{x}, \mathcal{D})  \propto\mathcal{N}(\hat{\mu}, \hat{\sigma}^2),
+$$
+
+$$
+\hat{\mu} = \frac{1}{\mathcal{M}}\sum_{\mathfrak{m}=1}^\mathcal{M}\hat{\mu}_\mathfrak{m}\\
+$$
+
+$$
+\hat{\sigma}^2= \frac{1}{\mathcal{M}}\sum_{\mathfrak{m}=1}^\mathcal{M}(\hat{\sigma}^2_\mathfrak{m}+\hat{\mu}^2_\mathfrak{m})-\hat{\mu}^2
+$$
+
 
