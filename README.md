@@ -127,3 +127,26 @@ $$
 $$
 \mathbb{E}_{q(w)}[w_k^2] = {\mu'_k}^2 + \Sigma'_{kk}.
 $$
+
+## Approximated Posterior Predictive Distribution
+And, the posterior predictive distribution can be approximated as \eqref{post_pred_dis}:
+
+$$
+p(\hat{y}|y) = \int p(\hat{y}|\phi(\hat{x}_i),w,\lambda)q(w,\lambda)d\lambda dw.\\
+$$
+
+However, as stated in \cite{bishop2013variational}, it can be shown that for increasing number of data points, $\lambda$ tends to its mean value ($\frac{e'}{f'}$), thus the predictive distribution is approximated as
+
+$$ 
+p(\hat{y}|y) = \int p(\hat{y}|\phi(\hat{x}_i),w,\mathbb{E}_{q(\lambda)}[\lambda])q(w)dw,\\
+$$
+
+or simply we can present it as Gaussian distribution with mean and variance as \cite{bishop2013variational},
+
+$$
+p(\hat{y}|y) = \mathcal{N}( \mu'^T\phi(\hat{x}_i),\frac{f'}{e'}+\phi(\hat{x}_i)^T\Sigma'\phi(\hat{x}_i )),\\
+$$
+
+where the variance parameter of the distribution quantifies the aleotric and epistemic uncertainties in the predicted travel times.
+
+
