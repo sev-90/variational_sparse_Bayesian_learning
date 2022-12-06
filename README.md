@@ -178,3 +178,15 @@ $$
 $$
 
 ![Algorithm](./figures/psudocode.png)
+
+## Model Verification
+Before training the VRVM model using travel time data sets, the implemented VRVM algorithm is verified with two widely used data sets: 1) $Sinc$ function, and 2) Boston housing data sets and compare the results with repoted results in literature review.
+## $Sinc$ function
+Using the suggested synthetic data generation in \cite{tipping2001sparse}, we evaluate the performance of the VRVM model through three different trials. The Gaussian kernel is used for training the VRVM models. For each trial, we generate 100 noisy target values, $y$s, at 100 linearly selected $x$s from $x\in [-10,10]$ using the function $Sinc(x)=sin(x)/x$ with Gaussian additive noise with standard deviations of 0.1, 0.2, and 0.3, respectively. The noise estimate and the root-mean-square (RMS) deviation from the true function evaluated at 1000 linearly spaced test samples in $[-10,10]$ averaged over 100 random instantiations of the noise are presented at table 1. The reported RMS deviation from the true function for Gaussian additive noise 0.1 is 0.038 \cite{bishop2013variational}.
+
+![Algorithm](./figures/table.png)
+
+## Boston housing data
+The housing data set contains 506 examples for median housing prices with 13 feature variables. We train the VRVM model using Gaussian kernel and based on housing data to predict housing prices. The averaged results for 10 randomly partitioned Boston Housing data into 481 training, and 25 test data sets are presented in table 1. The estimated noise and the mean squared error are 2.42 and 9.84, respectively, whereas the corresponding values reported at \cite{bishop2013variational} are 2.49 and 10.36 (\cite{bishop2013variational} utilized third order polynomial kernel), and the slight difference might be due to random data partition and different kernel type used.
+ 
+ ![Algorithm](./figures/sin.png)
