@@ -3,6 +3,7 @@ variational sparse Bayesian learning (relevance vector machine)
 # Abstract
 Accurate predictions of the route travel times and quantifying the reliability of the predictions are crucial in optimizing the service delivery transport in a city. This paper aims to predict the travel time distributions between any arbitrary locations in an urban network by training a probabilistic machine learning algorithm using historical trip data. In this project, variational relevance vector machines (VRVM) method and ensemble learning to probabilistically predict the trip travel time for any origin-destination pair at different times of day through learning the similarities between the previously observed travel times across the city road network. The similarities between the observed route travel times are quantified with multi-kernel function. Moreover, the VRVM method allows us to efficiently use historical data through sparse Bayesian learning that identifies the ``relevance" basis functions from the entire data.  
 
+In the following, some results relating to model verification and trip travel time are presented. Then, modeling details, including the algorithm and the mathematics behind the model, can be found in the following sections.
 ## Model Verification
 Before training the VRVM model using travel time data sets, the implemented VRVM algorithm is verified with two widely used data sets: 1) $Sinc$ function, and 2) Boston housing data sets and compare the results with repoted results in literature review.
 ## Sinc function
