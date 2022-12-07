@@ -205,7 +205,7 @@ In contrast, for very short trips and very long trips, the model's performance d
 ### Trip Travel Time Predictions vs Ground Truth
 ![Algorithm](./figures/prediction_vs_gt.png)
 
-### Temporal pattern of predictions
+### Temporal pattern of aggregated predictions for trips from an origin zone to different destination zones across 24hr a day
 ![Algorithm](./figures/temporal_pattern.png)
 
 
