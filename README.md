@@ -199,7 +199,7 @@ In contrast, for very short trips and very long trips, the model's performance d
 ### Historical Trip Travel Time Spatial Pattern
 ![Algorithm](./figures/travel_time_data_visualization.png)
 
-### Trip Travel Time Predictions vs Ground Truth
+### Relevance Vectors
 ![Algorithm](./figures/rvs.png)
 
 ### Trip Travel Time Predictions vs Ground Truth
